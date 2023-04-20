@@ -1,7 +1,7 @@
 Lab 09 - Grading the professor, Pt. 1
 ================
 Heather Hawkins
-Insert date here
+04-01-23
 
 ### Load packages and data
 
@@ -174,14 +174,133 @@ score for female professors (4.09) ———————————————
 
 Exercise 11
 
+``` r
+m_rank <- lm(score ~ rank, data = evals)
+summary(m_rank)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = score ~ rank, data = evals)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.8546 -0.3391  0.1157  0.4305  0.8609 
+    ## 
+    ## Coefficients:
+    ##                  Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)       4.28431    0.05365  79.853   <2e-16 ***
+    ## ranktenure track -0.12968    0.07482  -1.733   0.0837 .  
+    ## ranktenured      -0.14518    0.06355  -2.284   0.0228 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.5419 on 460 degrees of freedom
+    ## Multiple R-squared:  0.01163,    Adjusted R-squared:  0.007332 
+    ## F-statistic: 2.706 on 2 and 460 DF,  p-value: 0.06786
+
+The linear model is score = score = Tenure_track(-.13) + Tenured(-.14) +
+4.28
+
+The intercept (3.998) is the average evaluation score for professors
+with rank “full”, and the slopes (0.84 for rank “assistant” and 1.416
+for rank “associate”) represent the difference in average evaluation
+score between professors with that rank and professors with rank “full”.
+
 ## ————————————————-
 
-## Exercise 12
+Exercise 12
+
+``` r
+evals <- evals %>% 
+  mutate(rank_relevel = relevel(evals$rank, ref = "tenure track"))
+```
+
+## ————————————————-
+
+Exercise 13
+
+``` r
+m_rank_relevel <- lm(data = evals, score ~ rank_relevel)
+summary(m_rank_relevel)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = score ~ rank_relevel, data = evals)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.8546 -0.3391  0.1157  0.4305  0.8609 
+    ## 
+    ## Coefficients:
+    ##                      Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           4.15463    0.05214  79.680   <2e-16 ***
+    ## rank_relevelteaching  0.12968    0.07482   1.733   0.0837 .  
+    ## rank_releveltenured  -0.01550    0.06228  -0.249   0.8036    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.5419 on 460 degrees of freedom
+    ## Multiple R-squared:  0.01163,    Adjusted R-squared:  0.007332 
+    ## F-statistic: 2.706 on 2 and 460 DF,  p-value: 0.06786
+
+The linear model is score = teaching(.13) + tenured(-.02) + 4.15
+
+The intercept (4.168) is the average evaluation score for professors
+with rank “tenure track”, and the slopes represent that those with the
+rank “teaching” have a score 0.13 higher than the average and those with
+the rank “tenured” have a score -0.02 less than average)
+
+The R-squared value for the model is 0.01, which means that about 1% of
+the variance in evaluation scores can be explained by the rank of the
+professor.
+
+## ————————————————-
+
+Exercise 14
+
+``` r
+tenure_eligible <- ifelse(evals$rank %in% c("tenure track", "tenured"), "yes", "no")
+```
+
+## ————————————————-
+
+Exercise 15
+
+``` r
+m_tenure_eligible <- lm(score ~ tenure_eligible, data = evals)
+summary(m_tenure_eligible)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = score ~ tenure_eligible, data = evals)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.8438 -0.3438  0.1157  0.4360  0.8562 
+    ## 
+    ## Coefficients:
+    ##                    Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)          4.2843     0.0536  79.934   <2e-16 ***
+    ## tenure_eligibleyes  -0.1406     0.0607  -2.315    0.021 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.5413 on 461 degrees of freedom
+    ## Multiple R-squared:  0.0115, Adjusted R-squared:  0.009352 
+    ## F-statistic: 5.361 on 1 and 461 DF,  p-value: 0.02103
+
+The linear model is score = 4.28 + -0.14\*tenure_eligibleyes The
+intercept (4.28) is the average evaluation score for professors who are
+not eligible for tenure (i.e. “teaching” faculty), and the slope (-0.14)
+shows us that faculty that are tenure eligable have scores that are .14
+points lower than those that are not tenure eligable
+
+and the slopes (0.349 for rank “associate” and 0.705 for rank
+“assistant”) represent the difference in average evaluation score
+between professors with that rank and professors with rank “tenure
+track”
 
 ------------------------------------------------------------------------
-
-## Exercise 13
-
-------------------------------------------------------------------------
-
-## Exercise 14

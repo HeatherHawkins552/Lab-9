@@ -1,7 +1,7 @@
 ---
 title: "Lab 09 - Grading the professor, Pt. 1"
 author: "Heather Hawkins"
-date: "Insert date here"
+date: "04-01-23"
 output: github_document
 ---
 
@@ -138,7 +138,7 @@ Exercise 11
 m_rank <- lm(score ~ rank, data = evals)
 summary(m_rank)
 ```
-The linear model is score = score = Tenure_track(-.12) + Tenured(-.14) + 4.28
+The linear model is score = score = Tenure_track(-.13) + Tenured(-.14) + 4.28
 
 The intercept (3.998) is the average evaluation score for professors with rank "full", and the slopes (0.84 for rank "assistant" and 1.416 for rank "associate") represent the difference in average evaluation score between professors with that rank and professors with rank "full".
 
@@ -148,8 +148,8 @@ The intercept (3.998) is the average evaluation score for professors with rank "
 Exercise 12
 
 ```{r okay0}
-
-rank_relevel <- relevel(evals$rank, ref = "tenure track")
+evals <- evals %>% 
+  mutate(rank_relevel = relevel(evals$rank, ref = "tenure track"))
 
 ```
 
@@ -159,15 +159,15 @@ rank_relevel <- relevel(evals$rank, ref = "tenure track")
 Exercise 13
 
 ```{r rank_relevel}
-m_rank_relevel = lm(score ~ rank_relevel, data = evals)
+m_rank_relevel <- lm(data = evals, score ~ rank_relevel)
 summary(m_rank_relevel)
 ```
 
 The linear model is score = teaching(.13) + tenured(-.02) + 4.15
 
-The intercept (4.168) is the average evaluation score for professors with rank "tenure track", and the slopes (0.349 for rank "associate" and 0.705 for rank "assistant") represent the difference in average evaluation score between professors with that rank and professors with rank "tenure track".
+The intercept (4.168) is the average evaluation score for professors with rank "tenure track", and the slopes represent that those with the rank "teaching" have a score 0.13 higher than the average and those with the rank "tenured" have a score -0.02 less than average)
 
-The R-squared value for the model is 0.134, which means that about 13.4% of the variance in evaluation scores can be explained by the rank of the professor.
+The R-squared value for the model is 0.01, which means that about 1% of the variance in evaluation scores can be explained by the rank of the professor.
 
 -------------------------------------------------
 -------------------------------------------------
@@ -187,8 +187,10 @@ m_tenure_eligible <- lm(score ~ tenure_eligible, data = evals)
 summary(m_tenure_eligible)
 ```
 
-The linear model is score = 4.051 + 0.345*tenure_eligibleyes
-The intercept (4.051) is the average evaluation score for professors who are not eligible for tenure (i.e. "teaching" faculty), and the slope (0.345) represents the difference in average evaluation score between
+The linear model is score = 4.28 + -0.14*tenure_eligibleyes
+The intercept (4.28) is the average evaluation score for professors who are not eligible for tenure (i.e. "teaching" faculty), and the slope (-0.14) shows us that faculty that are tenure eligable have scores that are .14 points lower than those that are not tenure eligable
+
+and the slopes (0.349 for rank "associate" and 0.705 for rank "assistant") represent the difference in average evaluation score between professors with that rank and professors with rank "tenure track"
 
 
 -------------------------------------------------
