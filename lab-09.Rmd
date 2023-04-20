@@ -1,6 +1,6 @@
 ---
 title: "Lab 09 - Grading the professor, Pt. 1"
-author: "Insert your name here"
+author: "Heather Hawkins"
 date: "Insert date here"
 output: github_document
 ---
@@ -17,68 +17,178 @@ library(broom)
 ?score
 ```
 
+-------------------------------------------------
+Exercise 1
 
-Exercises
-Part 1: Exploratory Data Analysis
-Visualize the distribution of score. Is the distribution skewed? What does that tell you about how students rate courses? Is this what you expected to see? Why, or why not? Include any summary statistics and visualizations you use in your response.
+```{R Datas1}
+
+ggplot(evals, aes(x = score)) +
+  geom_histogram(binwidth = 0.5, fill = "dodgerblue") +
+  labs(x = "Score", y = "Frequency")
+```
+
+
+Yes, the distribution is heavily negatively skewed. This tells us that students usually rate thier professors very well- I expected to see this because usually- unless the professor is EXTREMELY mean and rude- people will rate professors postively.
+
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 2
+```{R Data}
+ggplot(evals, aes(x = score, y = bty_avg)) + geom_point(size = 3, color = "dodgerblue") + geom_smooth() +
+  labs(x = "Score", y = "Average Beauty Rating")
+```
+
+Within the graph, the model slow rises, slightly falls, then picks up.. Although it may be tempting to say "The average beauty of the professor affects the score rating- meaning that more "beautiful" professors get higher ratings"... I wouldn't say so- because of the slight dip around 4/ 4 1/2. 
+-------------------------------------------------
+------------------------------------------------
+Exercise 3
+
+```{R Data3}
+ggplot(evals, aes(x = score, y = bty_avg)) +
+  geom_jitter(width = 0.1, height = 0, color = "dodgerblue") + geom_smooth() + labs(x = "Score", y = "Average Beauty Rating")
+```
+
+The scatterplot with jitter shows that there are many courses taught by professors with an average beauty rating of 0, but there are also some courses taught by professors with an average beauty rating of 1 or 2 that received low scores. Overall, the scores seem fairly random. The initial scatterplot was misleading because it showed the density of points, rather than the distribution of scores at each level of beauty rating. Because of this- the original one made it seem as if there were a pattern- when there wasn't
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 4
+
+```{R okay3}
+m_bty <- lm(score ~ bty_avg, data = evals)
+summary(m_bty)
+
+```
+The linear model for predicting average professor evaluation score by average beauty rating is:
+
+^
+y (score)= 3.880 +0.07x(bty+ave)
+.
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 5
+
+```{r okay7}
+ggplot(evals, aes(x = bty_avg, y = score)) + 
+  geom_jitter() + 
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  ggtitle("Relationship between Score and Beauty Rating (Jittered with Regression Line)") + 
+  xlab("Average Beauty Rating") + 
+  ylab("Score")
+```
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 6
+
+Interpretation of the slope and intercept of the linear model
+The slope of the linear model is 0.07, which means that on average, for each unit increase in a professor's average beauty rating, the score of their course increases by 0.07.
 
 
 -------------------------------------------------
-#Excercise 1
-```{R Data}
-evals %>% 
-  ggplot(aes(x = score)) +
-  geom_bar()
-summary(evals$score)
+-------------------------------------------------
+
+Exercise 7
+
+The intercept of the linear model is 3.88, which means that if a professor had an average beauty rating of 0, the expected score of their course would be 3.88.
+
+In reality.. the intercept and slope do not mean much. Because 1. most professors are going to have a good rating (above 3) and 2. 0.07 per bty_avg doesn't mean much- because it doesnt increase alot. 
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 8
+```{r okay9}
+summary(m_bty)$r.squared
 ```
-Visualize and describe the relationship between score and the variable bty_avg, a professor’s average beauty rating.
 
-Hint: See the help page for the function at http://ggplot2.tidyverse.org/reference/index.html.
+The R-squared of the model is 0.0133, which means that only 1.33% of the variation in scores can be explained by the variation in average beauty ratings.
 
-Replot the scatterplot from Exercise 3, but this time use geom_jitter()? What does “jitter” mean? What was misleading about the initial scatterplot?
-Part 2: Linear regression with a numerical predictor
-Recall: Linear model is in the form  
-^
-y
-=
-b
-0
-+
-b
-1
-x
- .
+After looking at the intercept and slope. this makes sense. 
 
-Let’s see if the apparent trend in the plot is something more than natural variation. Fit a linear model called m_bty to predict average professor evaluation score by average beauty rating (bty_avg). Based on the regression output, write the linear model.
+-------------------------------------------------
+-------------------------------------------------
 
-Replot your visualization from Exercise 3, and add the regression line to this plot in orange color. Turn off the shading for the uncertainty of the line.
+Exercise 9
+```{r again}
+m_gen <- lm(score ~ gender, data = evals)
+```
 
-Interpret the slope of the linear model in context of the data.
 
-Interpret the intercept of the linear model in context of the data. Comment on whether or not the intercept makes sense in this context.
 
-Determine the  
-R
-2
-  of the model and interpret it in context of the data.
+-------------------------------------------------
+-------------------------------------------------
 
-Part 3: Linear regression with a categorical predictor
-Fit a new linear model called m_gen to predict average professor evaluation score based on gender of the professor. Based on the regression output, write the linear model and interpret the slope and intercept in context of the data.
+Exercise 10
 
-What is the equation of the line corresponding to male professors? What is it for female professors?
+```{r gend}
+summary(m_gen)
+```
+The linear model is: score = 4.09 + 0.14 * genderFemale
 
-Fit a new linear model called m_rank to predict average professor evaluation score based on rank of the professor. Based on the regression output, write the linear model and interpret the slopes and intercept in context of the data.
+THe slope shows that on average- male professors have scores that are .14 higher than female professors. 
+The intercept represents average score for female professors (4.09)
+-------------------------------------------------
+-------------------------------------------------
 
-Create a new variable called rank_relevel where "tenure track" is the baseline level.
+Exercise 11
 
-Fit a new linear model called m_rank_relevel to predict average professor evaluation score based on rank_relevel of the professor. This is the new (releveled) variable you created in Exercise 13. Based on the regression output, write the linear model and interpret the slopes and intercept in context of the data. Also determine and interpret the  
-R
-2
-  of the model.
+```{r brainhurts}
+m_rank <- lm(score ~ rank, data = evals)
+summary(m_rank)
+```
+The linear model is score = score = Tenure_track(-.12) + Tenured(-.14) + 4.28
 
-Create another new variable called tenure_eligible that labels "teaching" faculty as "no" and labels "tenure track" and "tenured" faculty as "yes".
+The intercept (3.998) is the average evaluation score for professors with rank "full", and the slopes (0.84 for rank "assistant" and 1.416 for rank "associate") represent the difference in average evaluation score between professors with that rank and professors with rank "full".
 
-Fit a new linear model called m_tenure_eligible to predict average professor evaluation score based on tenure_eligibleness of the professor. This is the new (regrouped) variable you created in Exercise 15. Based on the regression output, write the linear model and interpret the slopes and intercept in context of the data. Also determine and interpret the  
-R
-2
-  of the model.
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 12
+
+```{r okay0}
+
+rank_relevel <- relevel(evals$rank, ref = "tenure track")
+
+```
+
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 13
+
+```{r rank_relevel}
+m_rank_relevel = lm(score ~ rank_relevel, data = evals)
+summary(m_rank_relevel)
+```
+
+The linear model is score = teaching(.13) + tenured(-.02) + 4.15
+
+The intercept (4.168) is the average evaluation score for professors with rank "tenure track", and the slopes (0.349 for rank "associate" and 0.705 for rank "assistant") represent the difference in average evaluation score between professors with that rank and professors with rank "tenure track".
+
+The R-squared value for the model is 0.134, which means that about 13.4% of the variance in evaluation scores can be explained by the rank of the professor.
+
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 14
+```{r ouch}
+tenure_eligible <- ifelse(evals$rank %in% c("tenure track", "tenured"), "yes", "no")
+
+```
+
+-------------------------------------------------
+-------------------------------------------------
+
+Exercise 15
+```{r okayyy}
+m_tenure_eligible <- lm(score ~ tenure_eligible, data = evals)
+summary(m_tenure_eligible)
+```
+
+The linear model is score = 4.051 + 0.345*tenure_eligibleyes
+The intercept (4.051) is the average evaluation score for professors who are not eligible for tenure (i.e. "teaching" faculty), and the slope (0.345) represents the difference in average evaluation score between
+
+
+-------------------------------------------------
